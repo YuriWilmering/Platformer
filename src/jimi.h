@@ -5,27 +5,30 @@
 
 class Jimi {
 	public:
-		ofVec2f loc;
-		ofVec2f vel;
-		ofVec2f acc;
-		int radius;
-		int floor;
-		double gravity;
-		vector<int> heights;
-		int tallestObstacle;
-
 		Jimi();
 		void draw();
+		void setTallestObstacle(bool isWW, int obstacleY, int obstacleHeight);
+		void setFloorLevel(int obstacleHeight);
 		void keyPressed(int key);
 		void keyReleased(int key);
 		void update();
-		void walk();
+
+		ofVec2f loc;
+
+	private:
+		void run(int direction);
+		void halt();
 		void jump();
 		void fall();
-		void setTallestObstacle(bool isWW, int obstacleY, int obstacleHeight);
-		void setFloor(int obstacleHeight);
+		void wrapLocation();
 
-		bool pressingLeft, pressingUp, pressingRight, onFloor, jumping;
+		ofVec2f vel;
+		vector<int> heights;
+		int radius;
+		int floorLevel;
+		int tallestObstacle;
+		bool pressingLeft, pressingUp, pressingRight;
+		bool jumping, running, onFloor;
 };
 
 #endif // _JIMI_H_

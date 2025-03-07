@@ -35,7 +35,7 @@ void ofApp::update() {
 
 		jimi->setTallestObstacle( obstacle->isWithinWidth, 
 									obstacle->y, obstacle->height );
-		jimi->setFloor( obstacle->height );
+		jimi->setFloorLevel( obstacle->height );
 	}
 }
 
