@@ -58,8 +58,7 @@ void Jimi::update() {
     if (loc.y == floorHeight) {
         if (pressingLeft) {
             run(LEFT);
-        }
-        if (pressingRight) {
+        } else if (pressingRight) {
             run(RIGHT);
         }
     }
@@ -92,9 +91,7 @@ void Jimi::halt() {
             vel.x = 0;
             running = false;
         }
-    } 
-
-    if (vel.x > 0) {
+    } else if (vel.x > 0) {
         vel.x -= ACCELERATION;
 
         if (vel.x < 0) {
@@ -107,9 +104,7 @@ void Jimi::halt() {
 void Jimi::wrapLocation() {
     if (loc.x > WIDTH) {
         loc.x = 0;
-    }
-
-    if (loc.x < 0) {
+    } else if (loc.x < 0) {
         loc.x = WIDTH;
     }
 }
@@ -140,20 +135,21 @@ void Jimi::fall() {
 void Jimi::setTallestObstacle(bool isWW, int obstacleY, int obstacleHeight) {
     static vector<int> heights = {0};
 
-	if (isWW && loc.y < obstacleY) 
+	if (isWW && loc.y < obstacleY) {
         heights.push_back(obstacleHeight);
-    else if (!isWW) 
-        heights.erase(remove(heights.begin(), heights.end(), 
-                      obstacleHeight), heights.end());
+    } else if (!isWW) {
+        heights.erase(remove(heights.begin(), heights.end(), obstacleHeight), heights.end());
+    }
 
     tallestObstacle = *max_element(begin(heights), end(heights));
 }
 
 void Jimi::setFloorLevel(int obstacleHeight) {
-	if (obstacleHeight == tallestObstacle) 
+	if (obstacleHeight == tallestObstacle) {
         floorHeight = HEIGHT - obstacleHeight - RADIUS;
-    else if (tallestObstacle == 0) 
+    } else if (tallestObstacle == 0) {
         floorHeight = HEIGHT - RADIUS;
+    }
 }
 
 
