@@ -23,12 +23,10 @@ class Jimi {
 		void wrapLocation();
 
 		ofVec2f vel;
-		vector<int> heights;
-		int radius;
-		int floorLevel;
+		int floorHeight;
 		int tallestObstacle;
 		bool pressingLeft, pressingUp, pressingRight;
-		bool jumping, running, onFloor;
+		bool jumping, running;
 };
 
 #endif // _JIMI_H_

@@ -5,18 +5,15 @@ const float GRAVITY = 0.3;
 const float ACCELERATION = 0.35;
 const int LEFT = -1;
 const int RIGHT = 1;
-const int STILL = 0;
+const int RADIUS = 10;
 
 Jimi::Jimi() {
-    radius = 10;
-    floorLevel = HEIGHT - radius;
+    floorHeight = HEIGHT - RADIUS;
+    loc.set(WIDTH / 2, floorHeight);
+    vel.set(0, 0);
+    vel.limit(4);
     jumping = false;
     running = false;
-    onFloor = false;
-    loc.set(WIDTH / 2, floorLevel);
-    vel.set(0, 0);
-    heights = {0};
-    vel.limit(4);
     pressingLeft = false;
     pressingUp = false;
     pressingRight = false;
@@ -24,7 +21,7 @@ Jimi::Jimi() {
 
 void Jimi::draw() {
   	ofSetColor(255, 255, 100, 175);
-    ofDrawCircle(loc.x, loc.y, radius);	
+    ofDrawCircle(loc.x, loc.y, RADIUS);	
 }
 
 void Jimi::keyPressed(int key) {
@@ -57,9 +54,8 @@ void Jimi::keyReleased(int key) {
 
 void Jimi::update() {
     loc.x += vel.x;
-    onFloor = loc.y == floorLevel;
 
-    if (onFloor) {
+    if (loc.y == floorHeight) {
         if (pressingLeft) {
             run(LEFT);
         }
@@ -72,11 +68,11 @@ void Jimi::update() {
         halt();
     }
 
-    if ((onFloor && pressingUp) || jumping) {
+    if (((loc.y == floorHeight) && pressingUp) || jumping) {
         jump();
     }
 
-    if (!onFloor && !jumping) {
+    if (!(loc.y == floorHeight) && !jumping) {
         fall();
     }
 
@@ -135,13 +131,15 @@ void Jimi::fall() {
     fallVelocity += GRAVITY;
     loc.y += fallVelocity;
  
-    if (loc.y >= floorLevel) {
+    if (loc.y >= floorHeight) {
         fallVelocity = 0;
-        loc.y = floorLevel;
+        loc.y = floorHeight;
     }
 }
 
 void Jimi::setTallestObstacle(bool isWW, int obstacleY, int obstacleHeight) {
+    static vector<int> heights = {0};
+
 	if (isWW && loc.y < obstacleY) 
         heights.push_back(obstacleHeight);
     else if (!isWW) 
@@ -153,9 +151,9 @@ void Jimi::setTallestObstacle(bool isWW, int obstacleY, int obstacleHeight) {
 
 void Jimi::setFloorLevel(int obstacleHeight) {
 	if (obstacleHeight == tallestObstacle) 
-        floorLevel = HEIGHT - obstacleHeight - radius;
+        floorHeight = HEIGHT - obstacleHeight - RADIUS;
     else if (tallestObstacle == 0) 
-        floorLevel = HEIGHT - radius;
+        floorHeight = HEIGHT - RADIUS;
 }
 
 
