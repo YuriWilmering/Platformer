@@ -26,7 +26,7 @@ void ofApp::setup() {
 
 //--------------------------------------------------------------
 void ofApp::update() {
-	jimi->move();
+	jimi->update();
 
 	for (auto& obstacle : obstacles) {
 		obstacle->setWithinWidth(jimi->loc.x);
@@ -49,12 +49,12 @@ void ofApp::draw() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-	jimi->setMove(key, true);
+	jimi->keyPressed(key);
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key) {
-	jimi->setMove(key, false);
+	jimi->keyReleased(key);
 } 
 
 //--------------------------------------------------------------

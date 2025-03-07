@@ -1,17 +1,21 @@
 #include "jimi.h"
 
+int JUMP_POWER = -6;
+
 Jimi::Jimi() {
     radius = 10;
-    groundFloor = HEIGHT - radius;
-    floor = groundFloor;
+    floor = HEIGHT - radius;
+    jumping = false;
+    onFloor = false;
     loc.set(WIDTH / 2, floor);
     vel.set(0, 0);
-    acc.set(0.35, 0); 
-    maxVelocity = 4;
-    jumpVelocity = -6;
+    acc.set(0.35, 0);
     gravity = 0.3;
-    isJump = false;
     heights = {0};
+    vel.limit(4);
+    pressingLeft = false;
+    pressingUp = false;
+    pressingRight = false;
 }
 
 void Jimi::draw() {
@@ -19,77 +23,90 @@ void Jimi::draw() {
     ofDrawCircle(loc.x, loc.y, radius);	
 }
 
-bool Jimi::setMove(int k, bool b) {
-    switch (k) {
-        case OF_KEY_UP:
-            return isUp = b;
-         
-        case OF_KEY_LEFT:
-            return isLeft = b;
-         
-        case OF_KEY_RIGHT:
-            return isRight = b; 
-         
-        default:
-            return b;
+void Jimi::keyPressed(int key) {
+    if (key == OF_KEY_UP) {
+        pressingUp = true;
+    }
+
+    if (key == OF_KEY_LEFT) {
+        pressingLeft = true;
+    }
+
+    if (key == OF_KEY_RIGHT) {
+        pressingRight = true;
     }
 }
 
-void Jimi::move() {
-    // move on x axis
-    if (isLeft) 
+void Jimi::keyReleased(int key) {
+    if (key == OF_KEY_UP) {
+        pressingUp = false;
+    }
+
+    if (key == OF_KEY_LEFT) {
+        pressingLeft = false;
+    }
+
+    if (key == OF_KEY_RIGHT) {
+        pressingRight = false;
+    }
+}
+
+void Jimi::update() {
+    loc.x += vel.x;
+    onFloor = loc.y == floor;
+
+    walk();
+
+    if ((onFloor && pressingUp) || jumping) {
+        jump();
+    }
+
+    if (!onFloor && !jumping) {
+        fall();
+    }
+}
+
+void Jimi::walk() {
+    if (pressingLeft) 
         vel.x -= acc.x;
-    else if (!isLeft && vel.x < 0) {
+    else if (vel.x < 0) {
         vel.x += acc.x;
         if (vel.x > 0) 
             vel.x = 0;
     } 
-    if (isRight) 
+    if (pressingRight) 
         vel.x += acc.x;
-    else if (!isRight && vel.x > 0) {
+    else if (vel.x > 0) {
         vel.x -= acc.x;
         if (vel.x < 0) 
             vel.x = 0;
     }
-
-    vel.limit(maxVelocity);
-    loc.x += vel.x;
-
-    // fall down if not on floor && not jumping
-    if (loc.y != floor && !isJump) 
-        fall();
-
-    // jump only if on floor and key = OF_KEY_UP
-    if (loc.y == floor && isUp) 
-        isJump = true;
-    
-    if (isJump) 
-        jump(); 
 }
 
 void Jimi::jump() {
+    static float jumpVelocity = JUMP_POWER;
+    jumping = true;
     jumpVelocity += gravity;
     loc.y += jumpVelocity;
     
     if (jumpVelocity >= 0) {
-        fall();
-        isJump = false;
+        jumpVelocity = JUMP_POWER;
+        jumping = false;
    	}
 }
 
 void Jimi::fall() {
-    gravity += 0.3;
-    loc.y += gravity;
+    static float fallVelocity = 0;
+    fallVelocity += gravity;
+    loc.y += fallVelocity;
  
     if (loc.y >= floor) {
-        gravity = 0.3;
-        jumpVelocity = -6;
+        fallVelocity = 0;
         loc.y = floor;
     }
 }
 
 void Jimi::setTallestObstacle(bool isWW, int obstacleY, int obstacleHeight) {
-
 	if (isWW && loc.y < obstacleY) 
         heights.push_back(obstacleHeight);
     else if (!isWW) 
@@ -100,11 +117,10 @@ void Jimi::setTallestObstacle(bool isWW, int obstacleY, int obstacleHeight) {
 }
 
 void Jimi::setFloor(int obstacleHeight) {
-
 	if (obstacleHeight == tallestObstacle) 
         floor = HEIGHT - obstacleHeight - radius;
     else if (tallestObstacle == 0) 
-        floor = groundFloor;
+        floor = HEIGHT - radius;
 }
 
 
