@@ -4,23 +4,25 @@
 
 auto jimi = new Jimi;
 vector<unique_ptr<Obstacle>> obstacles;
-
-random_device r;
-default_random_engine s(r());
+random_device randomDevice;
+default_random_engine randomEngine(randomDevice());
 
 //--------------------------------------------------------------
 void ofApp::setup() {
 	ofBackground(0);
-	killcount = 0;
 	nObstacles = 10;
+	uniform_int_distribution<> positionDist(0, WIDTH - 200);
+	uniform_int_distribution<> heightDist(20, 200);
+	uniform_int_distribution<> widthDist(50, 200);
 
-	// generate obstacles with random x, y, width and height
-	for (auto i = 0; i < nObstacles; i++) {
-		uniform_int_distribution<> x 		(0, WIDTH - 200);
-		uniform_int_distribution<> height 	(20, 200);
-		uniform_int_distribution<> w 		(50, 200);
-		auto h = height(s);
-		obstacles.emplace_back(new Obstacle(x(s), HEIGHT - h, w(s), h));
+	for (int i = 0; i < nObstacles; i++) {
+		int height = heightDist(randomEngine);
+		int width = widthDist(randomEngine);
+		int position = positionDist(randomEngine);
+
+		obstacles.emplace_back(
+			new Obstacle(position, HEIGHT - height, width, height)
+		);
 	} 
 }
 
@@ -32,10 +34,8 @@ void ofApp::update() {
 		obstacle->setWithinWidth(jimi->loc.x);
 		obstacle->lightUp();
 
-
-		jimi->setTallestObstacle( obstacle->isWithinWidth, 
-									obstacle->y, obstacle->height );
-		jimi->setFloorLevel( obstacle->height );
+		jimi->setTallestObstacle(obstacle->isWithinWidth, obstacle->y, obstacle->height);
+		jimi->setFloorLevel(obstacle->height);
 	}
 }
 
@@ -43,8 +43,9 @@ void ofApp::update() {
 void ofApp::draw() {
 	jimi->draw();
 
-	for (auto& obstacle : obstacles) 
+	for (auto& obstacle : obstacles) {
 		obstacle->draw();
+	}
 }
 
 //--------------------------------------------------------------
