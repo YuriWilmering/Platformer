@@ -4,7 +4,6 @@ Jimi::Jimi() {
     floorHeight = HEIGHT - RADIUS;
     loc.set(WIDTH / 2, floorHeight);
     vel.set(0, 0);
-    vel.limit(4.);
     jumping = false;
     running = false;
     pressingLeft = false;
@@ -14,6 +13,7 @@ Jimi::Jimi() {
 
 void Jimi::update() {
     loc.x += vel.x;
+    vel.limit(4.);
 
     if (loc.y == floorHeight) {
         if (pressingLeft) {

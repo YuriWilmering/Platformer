@@ -1,9 +1,12 @@
 #include "ofApp.h"
 #include "jimi.h"
 #include "obstacle.h"
+#include "baseEntity.h"
+#include "enemy.h"
 
 auto jimi = new Jimi;
 vector<unique_ptr<Obstacle>> obstacles;
+vector<unique_ptr<Entity>> objects;
 random_device randomDevice;
 default_random_engine randomEngine(randomDevice());
 
@@ -57,6 +60,30 @@ void ofApp::keyPressed(int key) {
 void ofApp::keyReleased(int key) {
 	jimi->keyReleased(key);
 } 
+
+void ofApp::spawnEnemies() {
+    static uint64_t spawnTime;
+	static int randomX;
+	static bool isTimeSet = false;
+	static bool isSpawn = false;
+
+	if (!isTimeSet) {
+        uniform_int_distribution<> sT(0, 10000);
+        uniform_int_distribution<> rX(0, WIDTH);
+        spawnTime = ofGetElapsedTimeMillis() + sT(randomEngine);
+        randomX = rX(randomEngine);
+        isTimeSet = true;
+        isSpawn = false;
+    }
+
+    if (!isSpawn) {
+        if (ofGetElapsedTimeMillis() >= spawnTime) {
+            objects.emplace_back(new Enemy(randomX));
+            isSpawn = true;
+            isTimeSet = false;
+        }
+    }
+}
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
